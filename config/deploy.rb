@@ -1,5 +1,4 @@
 require 'bundler/capistrano'
-
 set :application, "texapp.org"
 
 set :repository,  "git@github.com:texapp/web.git"
@@ -42,3 +41,13 @@ namespace :deploy do
 end
 
 after 'deploy:update_code', 'deploy:symlink_credentials'
+
+before 'deploy:restart', 'barista:brew'
+
+_cset(:barista_role) { :app }
+
+namespace :barista do
+  task :brew, :roles => lambda { fetch(:barista_role) } do
+    run("cd #{current_path} ; bundle exec rake barista:brew")
+  end
+end

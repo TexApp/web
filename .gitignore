@@ -18,3 +18,4 @@ _yardoc
 doc/
 
 credentials.yml
+coffeescripts/*.js

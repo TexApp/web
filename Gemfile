@@ -7,6 +7,11 @@ gem "rack-cache"
 gem "cloudfiles"
 gem "data_mapper"
 gem "dm-mysql-adapter"
+gem "barista"
+gem "json"
+gem "sinatra-partial"
+gem "rdiscount"
+gem "rake"
 
 group :production do
   gem 'thin'

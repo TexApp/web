@@ -1,0 +1,12 @@
+.row
+  .span12
+    .page-header
+      %h1
+        Search
+        %br
+        %small
+          = surround("“", "”") do
+            %span.query= @query
+    %ul.results
+      - @results.each do |o|
+        = partial :opinion, :locals => { :opinion => o }

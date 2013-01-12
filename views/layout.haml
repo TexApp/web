@@ -1,33 +1,35 @@
 !!!
-%html
+%html{:lang => :en}
   %head
     %meta{:charset => "UTF-8"}
     %meta{:name => "viewport", :content => "width=device-width, initial-scale=1.0"}
     %title Tex App.—Online
-    %link{:rel => :stylesheet, :href => "/bootstrap.min.css"}
-    %link{:rel => :stylesheet, :href => "/bootstrap-responsive.min.css"}
-    %link{:rel => :stylesheet, :href => "/styles.css"}
+    %link{:rel => :stylesheet, :href => "/stylesheets/bootstrap.min.css"}
+    %link{:rel => :stylesheet, :href => "/stylesheets/bootstrap-responsive.min.css"}
+    %link{:rel => :stylesheet, :href => "/stylesheets/styles.css"}
   %body
-    .navbar
+    .navbar.navbar-fixed-top
       .navbar-inner
-        .container-fluid
+        .container
           %a.btn.btn-navbar{"data-toggle" => "collapse", "data-target" => ".nav-collapse"}
             %span.icon-bar
             %span.icon-bar
             %span.icon-bar
-          %a.brand.sc TexApp.org
+              %a.brand.sc{:href => "/"} TexApp.org
           .nav.collapse.nav-collapse
             %ul.nav
-              - links = {'Home' => '/', 'About' => '/about'}
+              - links = {'<i class="icon-home"></i>' => '/', 'About' => '/about', "Citation" => "/citation", "Technology" => "/technology"}
               - links.each do |title, url|
                 %li{class: request.path_info == url && 'active'}
-                  %a{:href => url}
-                    = title
-    .container-fluid
-      .row-fluid
-        = yield
+                  %a{:href => url}!= title
+          %form#search.navbar-search.pull-right{:method => :get, :action => "/search"}
+            %input.search-query{:name => :query, :type => "text", :placeholder => "Search terms or Docket #"}
+    .container
+      = yield
       %hr
       %footer
-        &copy; Don Cruse &amp; Kyle Mitchell
+        %span.pull-right
+          &copy; Don Cruse &amp; Kyle Mitchell
     %script{:src => "http://code.jquery.com/jquery-latest.js"}
-    %script{:src => "/bootstrap.min.js"}
+    %script{:src => "/javascripts/bootstrap.min.js"}
+    %script{:src => "/coffeescripts/search.js"}
