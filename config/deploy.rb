@@ -36,6 +36,7 @@ namespace :deploy do
   end
 
   task :symlink_credentials, :roles => :app do
+    run "rm -f #{release_path}/config/credentials.yml"
     run "ln -nfs #{deploy_to}/shared/config/credentials.yml #{release_path}/config/credentials.yml"
   end
 end
