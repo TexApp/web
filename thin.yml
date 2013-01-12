@@ -5,7 +5,7 @@ address: 127.0.0.1
 user: thin
 group: thin
 port: 8000
-pid: /var/www/texapp.org/current/tmp/thin.pid
+pid: /var/www/texapp.org/current/tmp/pids/thin.pid
 rackup: /var/www/texapp.org/current/config.ru
 log: /var/www/texapp.org/current/log/thin.log
 max_conns: 1024
