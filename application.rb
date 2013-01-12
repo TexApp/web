@@ -35,6 +35,15 @@ class TexAppOrg < Sinatra::Base
     haml :opinions
   end
 
+  get "/court/:court" do
+    @opinions = Opinion.all(
+      :number.like => format("%02d-%", params[:court].to_i),
+      :order => [:date.desc]
+    )
+    @court = params[:court]
+    haml :court
+  end
+
   get '/' do
     haml :index
   end
