@@ -4,13 +4,6 @@ require 'rack/cache'
 require 'haml'
 require_relative './environment'
 
-unless ENV['RACK_ENV'] == 'development'
-  use Rack::Cache do
-    set :metastore, 'heap:/'
-    set :entitystore, 'heap:/'
-  end
-end
-
 class TexAppOrg < Sinatra::Base
   set :haml, {:format => :html5}
 
