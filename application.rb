@@ -1,8 +1,9 @@
 require 'rubygems'
 require 'bundler/setup'
-require 'rack/cache'
 require 'haml'
 require_relative './environment'
+
+use Rack::Deflater
 
 class TexAppOrg < Sinatra::Base
   set :haml, {:format => :html5}
