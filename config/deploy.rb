@@ -18,11 +18,11 @@ role :app, "texapp.org"
 
 namespace :deploy do
   task :start, :roles => [:web, :app] do
-    run "cd #{deploy_to}/current && nohup thin -C thin/production.yml -R config.ru start"
+    run "cd #{deploy_to}/current && nohup bundle exec thin -C thin/production.yml -R config.ru start"
   end
  
   task :stop, :roles => [:web, :app] do
-    run "cd #{deploy_to}/current && nohup thin -C thin/production.yml -R config.ru stop"
+    run "cd #{deploy_to}/current && nohup bundle exec thin -C thin/production.yml -R config.ru stop"
   end
  
   task :restart, :roles => [:web, :app] do
