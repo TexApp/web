@@ -4,10 +4,11 @@ set :application, "texapp.org"
 
 set :repository,  "git@github.com:texapp/web.git"
 set :scm, :git
+set :git_enable_submodules, 1
 
 default_run_options[:pty] = true
-set :user, 'thin'
 ssh_options[:forward_agent] = true
+set :user, 'thin'
 set :use_sudo, false
 
 set :deploy_via, :remote_cache
@@ -34,4 +35,10 @@ namespace :deploy do
     deploy.update
     deploy.start
   end
+
+  task :symlink_credentials, :roles => :app do
+    run "ln -nfs #{deploy_to}/shared/config/credentials.yml #{release_path}/config/credentials.yml"
+  end
 end
+
+after 'deploy:update_code', 'deploy:symlink_credentials'
