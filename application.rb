@@ -22,36 +22,40 @@ class TexAppOrg < Sinatra::Base
   # citation links
   get %r{^/(\d\d-\d\d-\d\d\d\d.+)} do
     docket_number = params[:captures].first
-    opinions = Opinion.all(:number => docket_number)
-    # on matching opinion:
-    # redirect to CloudFiles
-    if opinions.count == 1
-      opinion = opinions.first
+    md5sum = params[:md5]
+    if md5sum && md5sum.length == 32
+      filename = "#{docket_number}_#{md5sum}.pdf"
       container = $cloudfiles.container(CONTAINER)
-      object = container.object(opinion.filename)
+      object = container.object(filename)
+      attachment "#{docket_number}.pdf"
       redirect object.public_url
-    # more than one opinion:
-    # show all opinions for case
-    elsif opinions.count > 1
-      redirect "/opinions/#{docket_number}"
-    # no matching opinion
     else
-      haml :bad_citation
+      court_case = Case.first :docket_number => docket_number
+      opinions = court_case.opinions
+      if opinions.count == 1
+        opinion = opinions.first
+        filename = "#{court_case.docket_number}_#{opinion.md5sum}.pdf"
+        container = $cloudfiles.container(CONTAINER)
+        object = container.object(filename)
+        attachment "#{docket_number}.pdf"
+        redirect object.public_url
+      elsif opinions.count > 1
+        redirect "/case/#{docket_number}"
+      else
+        haml :bad_citation
+      end
     end
   end
 
-  get "/opinions/:docket" do
+  get "/case/:docket" do
     docket_number = params[:docket]
-    @the_case = Case.first(:number => docket_number)
-    haml :opinions
+    @the_case = Case.first :docket_number => docket_number
+    haml :case
   end
 
   get "/court/:court" do
     @court = params[:court].to_i
-    @opinions = Opinion.all(
-      :number.like => format("%02d-%", @court),
-      :order => [:date.desc]
-    )
+    @opinions = Opinion.all(:case => { :court => @court })
     haml :court
   end
 
@@ -72,6 +76,8 @@ class TexAppOrg < Sinatra::Base
 
   helpers do
     CARDINALS = %w{_ First Second Third Fourth Fifth Sixth Seventh Eigth Ninth Tenth Eleventh Twelfth Thirteenth Fourteenth}
+    CARDINALS = 
+
     CITIES = %w{_ Houston Fort\ Worth Austin San\ Antonio Dallas Texarkana Amarillo El\ Paso Beaumont Waco Eastland Tyler Corpus\ Christi/Edinburg Houston}
     def court_name(number)
       cardinal_name(number) + "—#{CITIES[number]}"

@@ -1,9 +1,10 @@
-.span
-  .page-header
-    %h1
-      = cardinal_name(@court)
-      %br
-      %small= CITIES[@court]
-  %ul
-    - @opinions.each do |o|
-      %li= partial :opinion, :locals => { :opinion => o }
+.row
+  .span12
+    .page-header
+      %h1
+        = cardinal_name(@court)
+        %br
+        %small= CITIES[@court]
+    %ul
+      - @opinions.each do |o|
+        %li= partial :opinion, :locals => { :opinion => o }
