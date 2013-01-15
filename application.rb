@@ -8,12 +8,18 @@ require 'haml'
 require 'will_paginate'
 require 'will_paginate/data_mapper'
 require "will_paginate-bootstrap"
+require 'sinatra/json'
+require 'sinatra/config_file'
 
 # TODO: memcache? for Rack::Cache?
 
 class TexAppOrg < Sinatra::Base
   register Sinatra::Partial
-  include WillPaginate::Sinatra::Helpers
+
+  register Sinatra::ConfigFile
+  config_file 'config/credentials.yml'
+
+  helpers WillPaginate::Sinatra::Helpers
 
   # automatic CoffeeScript compilation
   register Barista::Integration::Sinatra
@@ -115,8 +121,34 @@ class TexAppOrg < Sinatra::Base
     }
   end
 
+  get '/stats' do
+    haml :stats, :locals => {:d3 => true, :js => 'coffeescripts/stats.js' }
+  end
+
+  get '/stats.json' do
+    weekago = Date.today - 30
+    result = (1..14).map do |court|
+      {
+        :name => "#{CARDINAL_DIGITS[court]} #{CITIES[court]}",
+        :data => (weekago..Date.today).map { |day|
+          {
+            :x => day.strftime('%s').to_i,
+            :y => Opinion.count(
+              :case => { :court => court },
+              :date => day
+            )
+          }
+        }
+      }
+    end
+    json result
+  end
+
+  helpers Sinatra::JSON
+
   helpers do
     CARDINALS = %w{_ First Second Third Fourth Fifth Sixth Seventh Eigth Ninth Tenth Eleventh Twelfth Thirteenth Fourteenth}
+    CARDINAL_DIGITS = %w{_ 1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th 13th 14th}
 
     CITIES = %w{_ Houston Fort\ Worth Austin San\ Antonio Dallas Texarkana Amarillo El\ Paso Beaumont Waco Eastland Tyler Corpus\ Christi/Edinburg Houston}
     def court_name(number)
