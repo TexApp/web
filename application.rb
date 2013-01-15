@@ -1,15 +1,19 @@
 # encoding: UTF-8
 require 'rubygems'
 require 'bundler/setup'
+require_relative './environment'
 require 'barista'
 require 'sinatra/partial'
 require 'haml'
-require_relative './environment'
+require 'will_paginate'
+require 'will_paginate/data_mapper'
+require "will_paginate-bootstrap"
 
 # TODO: memcache? for Rack::Cache?
 
 class TexAppOrg < Sinatra::Base
   register Sinatra::Partial
+  include WillPaginate::Sinatra::Helpers
 
   # automatic CoffeeScript compilation
   register Barista::Integration::Sinatra
@@ -55,28 +59,64 @@ class TexAppOrg < Sinatra::Base
 
   get "/court/:court" do
     @court = params[:court].to_i
-    @opinions = Opinion.all(:case => { :court => @court })
-    haml :court
+    @opinions = Opinion.paginate(
+      :case => { :court => @court },
+      :page => params[:page],
+      :order => [:date.desc],
+      :per_page => 20
+    )
+    haml :simple, :locals => {
+      :heading => cardinal_name(@court),
+      :subheading => CITIES[@court]
+    }
+  end
+
+  get "/recent" do
+    @opinions = Opinion.paginate(
+      :order => [:date.desc],
+      :page => params[:page],
+      :per_page => 20
+    )
+    haml :simple, :locals => { :heading => 'Recent Opinions' }
   end
 
   get '/' do haml :index end
 
-  get '/about' do haml :about end
+  get '/about' do
+    haml :markdown, :locals => {
+      :heading => 'About',
+      :file => 'about.md'
+    }
+  end
 
-  get "/citation" do haml :citation end
+  get '/citation' do
+    haml :markdown, :locals => {
+      :heading => 'Citation',
+      :file => 'citation.md'
+    }
+  end
 
-  get "/technology" do haml :citation end
+  get '/technology' do
+    haml :markdown, :locals => {
+      :heading => 'Technology',
+      :file => 'technology.md'
+    }
+  end
 
   get '/search' do
     @query = params[:query]
-    # TODO: Implement search
-    @results = []
-    haml :search
+    redirect "/" unless @query
+    @opinions = Opinion.paginate(
+      :order => [:date.desc]
+    )
+    haml :simle, :locals => {
+      :heading => 'Search Results',
+      :subheading => "“#{@query}”"
+    }
   end
 
   helpers do
     CARDINALS = %w{_ First Second Third Fourth Fifth Sixth Seventh Eigth Ninth Tenth Eleventh Twelfth Thirteenth Fourteenth}
-    CARDINALS = 
 
     CITIES = %w{_ Houston Fort\ Worth Austin San\ Antonio Dallas Texarkana Amarillo El\ Paso Beaumont Waco Eastland Tyler Corpus\ Christi/Edinburg Houston}
     def court_name(number)

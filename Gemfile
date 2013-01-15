@@ -12,6 +12,8 @@ gem "json"
 gem "sinatra-partial"
 gem "rdiscount"
 gem "rake"
+gem 'will_paginate'
+gem 'will_paginate-bootstrap'
 
 group :production do
   gem 'thin'

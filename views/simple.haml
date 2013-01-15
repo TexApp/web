@@ -2,9 +2,10 @@
   .span12
     .page-header
       %h1
-        = cardinal_name(@court)
-        %br
-        %small= CITIES[@court]
+        = heading
+        - if defined? subheading
+          %br
+          %small= subheading
     %ul
       - @opinions.each do |o|
         %li= partial :opinion, :locals => { :opinion => o }
